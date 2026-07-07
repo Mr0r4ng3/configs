@@ -110,10 +110,13 @@ alias ll="ls -l"
 alias la="ls -la"
 alias vi="nvim"
 alias vim="nvim"
-alias bcat="batcat --paging=never"
+alias cat="batcat --paging=never --color=always"
 alias resource="source ~/.zshrc && echo '\x1b[32m~/.zshrc Reloaded!\x1b[0m'"
 alias zshedit="nvim ~/.zshrc"
 alias docker-rm-all="docker rm -vf $(docker ps -aq)"
 alias docker-rmi-all="docker rmi -f $(docker images -aq)"
 
-. "$HOME/.local/bin/env"
+#. "$HOME/.local/bin/env"
+
+# opencode
+export PATH=/home/mr0rang3/.opencode/bin:$PATH
