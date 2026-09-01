@@ -9,6 +9,7 @@ Quick reference index mapping repository files to their target OS locations. Des
 | Repo Source | Target OS Path | Component |
 | :--- | :--- | :--- |
 | [`.zshenv`](.zshenv) | `~/.zshenv` | Zsh environment bootstrap (sets `ZDOTDIR`) |
+| [`config/fastfetch/`](config/fastfetch) | `~/.config/fastfetch` | Fastfetch system information configuration |
 | [`config/kitty/`](config/kitty) | `~/.config/kitty` | Kitty terminal emulator & color themes |
 | [`config/lazygit/`](config/lazygit) | `~/.config/lazygit` | Lazygit TUI configuration |
 | [`config/nvim/`](config/nvim) | `~/.config/nvim` | Neovim IDE configuration (`lazy.nvim`) |
@@ -39,6 +40,7 @@ Quick reference index mapping repository files to their target OS locations. Des
 | [`config/zsh/aliases.zsh`](config/zsh/aliases.zsh) | `~/.config/zsh/aliases.zsh` | Command aliases and shortcuts |
 | [`config/zsh/completion.zsh`](config/zsh/completion.zsh) | `~/.config/zsh/completion.zsh` | Completion menu, styles, and caching options |
 | [`config/zsh/env.zsh`](config/zsh/env.zsh) | `~/.config/zsh/env.zsh` | Shell session environment variables |
+| [`config/zsh/fastfetch.zsh`](config/zsh/fastfetch.zsh) | `~/.config/zsh/fastfetch.zsh` | Responsive Fastfetch startup hook with size adaptation |
 | [`config/zsh/functions.zsh`](config/zsh/functions.zsh) | `~/.config/zsh/functions.zsh` | Custom utility functions |
 | [`config/zsh/history.zsh`](config/zsh/history.zsh) | `~/.config/zsh/history.zsh` | History file size and behavior rules |
 | [`config/zsh/keybindings.zsh`](config/zsh/keybindings.zsh) | `~/.config/zsh/keybindings.zsh` | ZLE keybindings and keyboard shortcuts |
@@ -79,5 +81,6 @@ Quick reference index mapping repository files to their target OS locations. Des
 
 | File | Target OS Path | Purpose |
 | :--- | :--- | :--- |
+| [`config/fastfetch/config.jsonc`](config/fastfetch/config.jsonc) | `~/.config/fastfetch/config.jsonc` | Fastfetch layout, modules, and theme styling |
 | [`config/lazygit/config.yml`](config/lazygit/config.yml) | `~/.config/lazygit/config.yml` | Lazygit TUI options and keybindings |
 | [`config/systemd/user/rclone@.service`](config/systemd/user/rclone@.service) | `~/.config/systemd/user/rclone@.service` | Systemd user template unit for rclone mounts |

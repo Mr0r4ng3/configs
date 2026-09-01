@@ -138,7 +138,7 @@ install_system_packages() {
   case "$DISTRO_ID" in
     arch|cachyos|manjaro|endeavouros)
       local pkgs=(
-        zsh git curl fzf ripgrep fd eza bat lazygit rclone jq
+        zsh git curl fzf ripgrep fd eza bat lazygit rclone jq fastfetch
         unzip p7zip zstd neovim gcc make cmake nodejs npm python
         python-pip luarocks kitty tmux wl-clipboard ttf-jetbrains-mono-nerd
       )
@@ -154,7 +154,7 @@ install_system_packages() {
 
     fedora)
       local pkgs=(
-        zsh git curl fzf ripgrep fd-find eza bat lazygit rclone jq
+        zsh git curl fzf ripgrep fd-find eza bat lazygit rclone jq fastfetch
         unzip p7zip zstd neovim gcc make cmake nodejs npm python3
         python3-pip kitty tmux wl-clipboard jetbrains-mono-fonts-all
       )
@@ -164,7 +164,7 @@ install_system_packages() {
 
     ubuntu|debian|pop)
       local pkgs=(
-        zsh git curl fzf ripgrep fd-find bat rclone jq
+        zsh git curl fzf ripgrep fd-find bat rclone jq fastfetch
         unzip p7zip-full zstd neovim build-essential cmake
         nodejs npm python3 python3-pip kitty tmux wl-clipboard
       )

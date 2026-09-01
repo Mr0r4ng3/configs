@@ -26,6 +26,7 @@ A modular, clean, and XDG-compliant configuration suite for Linux environments f
 | **Terminal** | [Kitty](https://sw.kovidgoyal.net/kitty/) | GPU-accelerated terminal emulator with Noctalia & Nord color themes |
 | **Multiplexer** | [Tmux](https://github.com/tmux/tmux) | Terminal multiplexer configured with TPM, continuum, and resurrect |
 | **Git Client** | [Lazygit](https://github.com/jesseduffield/lazygit) | Terminal UI for Git operations |
+| **System Info** | [Fastfetch](https://github.com/fastfetch-cli/fastfetch) | Fast, responsive system information fetch tool with adaptive terminal sizing |
 | **Services** | [systemd (user)](https://www.freedesktop.org/software/systemd/man/systemd.service.html) | User-level background services (e.g. `rclone@.service`) |
 
 ---
@@ -72,6 +73,7 @@ mkdir -p "$HOME/.config" "$HOME/.config/systemd/user"
 ln -sfn "$HOME/.myconfigs/.zshenv" "$HOME/.zshenv"
 
 # ~/.config module directories
+ln -sfn "$HOME/.myconfigs/config/fastfetch" "$HOME/.config/fastfetch"
 ln -sfn "$HOME/.myconfigs/config/kitty" "$HOME/.config/kitty"
 ln -sfn "$HOME/.myconfigs/config/lazygit" "$HOME/.config/lazygit"
 ln -sfn "$HOME/.myconfigs/config/nvim" "$HOME/.config/nvim"
@@ -90,6 +92,7 @@ systemctl --user daemon-reload
 ### 🐚 Zsh Shell
 - **Zero-Clutter Home**: All configuration and state files (`.zshrc`, `.zshenv`, history, compdump) reside inside `~/.config/zsh/`.
 - **Modular Scripts**: Separated into [aliases](config/zsh/aliases.zsh), [completion](config/zsh/completion.zsh), [environment variables](config/zsh/env.zsh), [functions](config/zsh/functions.zsh), [history](config/zsh/history.zsh), [keybindings](config/zsh/keybindings.zsh), and [options](config/zsh/options.zsh).
+- **Adaptive Fastfetch Hook**: Automatically runs [Fastfetch](config/zsh/fastfetch.zsh) on interactive shell startup, dynamically scaling output between full, compact, or suppressed based on current terminal dimensions.
 - **Local Overrides**: Machine-specific tokens and custom environment variables can be placed in `~/.config/zsh/local.zsh` (gitignored).
 
 ### 📝 Neovim
