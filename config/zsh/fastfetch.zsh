@@ -27,3 +27,4 @@ if [[ -o interactive ]] && (( $+commands[fastfetch] )); then
     fastfetch 2>/dev/null
   fi
 fi
+
