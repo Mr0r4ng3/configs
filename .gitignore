@@ -1,0 +1,17 @@
+# Zsh temporary and cache files
+.zcompdump*
+*.zwc
+.zsh_history
+local.zsh
+
+# Editor backups and swap files
+*.swp
+*.swo
+*~
+*.bak
+.netrwhist
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
