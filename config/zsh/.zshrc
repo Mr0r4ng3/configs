@@ -21,6 +21,11 @@ ZSH_THEME="robbyrussell"
 plugins=(
   git
   sudo
+  fzf
+  docker
+  docker-compose
+  uv
+  nvm
 )
 
 # Load Oh My Zsh
