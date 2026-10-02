@@ -1,120 +1,84 @@
-# Dotfiles
+# Modular XDG Dotfiles Suite
 
-A modular, clean, and XDG-compliant configuration suite for Linux environments featuring Neovim, Kitty, Tmux, and Zsh.
+A reproducible, high-performance, and XDG-compliant development environment for Linux featuring Neovim, Kitty, Tmux, Zsh, Fast Node Manager (`fnm`), and `pnpm`. Engineered for full portability across distributions (Debian/Ubuntu, Arch, Fedora) and display servers (Wayland & X11).
 
 > [!TIP]
-> **For AI Assistants & Quick Lookup**:
-> To quickly explore the repository hierarchy, locate specific configuration files, and see their target OS paths without loading excessive context, please inspect [**`structure.md`**](structure.md).
+> **Low-Token Navigation for AI Assistants**:
+> To explore file mappings and OS target paths without loading excessive context, consult [**`structure.md`**](structure.md).
 
 ---
 
-## Architecture & Philosophy
+## Quick Path
 
-- **XDG Base Directory Compliance**: All configurations reside under `$HOME/.config` (`$XDG_CONFIG_HOME`) to keep `$HOME` clean and standardized.
-- **Zsh Clean Bootstrap**: A lightweight root `~/.zshenv` sets `ZDOTDIR="$HOME/.config/zsh"`, moving all Zsh startup, history, and cache files inside `~/.config/zsh/`.
-- **Modularity**: Neovim and Zsh configurations are split into focused, single-responsibility files for maintainability and clarity.
-- **Portability & Automation**: Automated deployment and toolchain provisioning via [`install.sh`](install.sh).
-
----
-
-## Core Toolchain & Stack
-
-| Component | Tool / Framework | Description |
-| :--- | :--- | :--- |
-| **Editor** | [Neovim](https://neovim.io/) (>= 0.10) | Modern text editor powered by `lazy.nvim`, LSP, Treesitter, Conform, and Snacks.nvim |
-| **Shell** | [Zsh](https://www.zsh.org/) | Modular shell setup with Oh-My-Zsh, custom completions, aliases, and functions |
-| **Terminal** | [Kitty](https://sw.kovidgoyal.net/kitty/) | GPU-accelerated terminal emulator with Noctalia & Nord color themes |
-| **Multiplexer** | [Tmux](https://github.com/tmux/tmux) | Terminal multiplexer configured with TPM, continuum, and resurrect |
-| **Git Client** | [Lazygit](https://github.com/jesseduffield/lazygit) | Terminal UI for Git operations |
-| **System Info** | [Fastfetch](https://github.com/fastfetch-cli/fastfetch) | Fast, responsive system information fetch tool with adaptive terminal sizing |
-| **Services** | [systemd (user)](https://www.freedesktop.org/software/systemd/man/systemd.service.html) | User-level background services (e.g. `rclone@.service`) |
-
----
-
-## Quick Start & Automated Installation
-
-### 1. Clone the Repository
+Deploy the complete environment in three steps:
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/Mr0r4ng3/configs.git ~/.myconfigs
 cd ~/.myconfigs
+
+# 2. Install system packages and CLI tools (requires sudo)
+./scripts/install-deps.sh
+
+# 3. Deploy symlinks and bootstrap userland plugins (safe, non-root)
+./install.sh -b
 ```
 
-### 2. Run the Automated Installer
-
-The included [`install.sh`](install.sh) script automatically detects your distribution, installs required system packages and tools, creates all necessary symlinks, and bootstraps plugins:
-
+To rollback anytime and restore previous configurations:
 ```bash
-chmod +x install.sh
-./install.sh
-```
-
-#### Installer Flags:
-
-| Flag | Description |
-| :--- | :--- |
-| `--dry-run` | Preview actions (package installations and symlinks) without modifying the system |
-| `--symlinks-only` | Only create symbolic links and bootstrap plugins without installing system packages |
-| `--backup` | Create timestamped backups of existing non-symlink configurations before overwriting |
-| `--no-pkg` | Skip system package installation step |
-| `--help` | Show usage options and flags |
-
----
-
-## Manual Deployment via Symbolic Links
-
-If you prefer to link configuration files manually without using the installer script:
-
-```bash
-# Ensure target base directories exist
-mkdir -p "$HOME/.config" "$HOME/.config/systemd/user"
-
-# Root environment bootstrap (redirects ZDOTDIR to ~/.config/zsh)
-ln -sfn "$HOME/.myconfigs/.zshenv" "$HOME/.zshenv"
-
-# ~/.config module directories
-ln -sfn "$HOME/.myconfigs/config/fastfetch" "$HOME/.config/fastfetch"
-ln -sfn "$HOME/.myconfigs/config/kitty" "$HOME/.config/kitty"
-ln -sfn "$HOME/.myconfigs/config/lazygit" "$HOME/.config/lazygit"
-ln -sfn "$HOME/.myconfigs/config/nvim" "$HOME/.config/nvim"
-ln -sfn "$HOME/.myconfigs/config/tmux" "$HOME/.config/tmux"
-ln -sfn "$HOME/.myconfigs/config/zsh" "$HOME/.config/zsh"
-
-# Systemd user services
-ln -sfn "$HOME/.myconfigs/config/systemd/user/rclone@.service" "$HOME/.config/systemd/user/rclone@.service"
-systemctl --user daemon-reload
+./uninstall.sh -r
 ```
 
 ---
 
-## Component Highlights
+## Lifecycle Scripts
 
-### 🐚 Zsh Shell
-- **Zero-Clutter Home**: All configuration and state files (`.zshrc`, `.zshenv`, history, compdump) reside inside `~/.config/zsh/`.
-- **Modular Scripts**: Separated into [aliases](config/zsh/aliases.zsh), [completion](config/zsh/completion.zsh), [environment variables](config/zsh/env.zsh), [functions](config/zsh/functions.zsh), [history](config/zsh/history.zsh), [keybindings](config/zsh/keybindings.zsh), and [options](config/zsh/options.zsh).
-- **Adaptive Fastfetch Hook**: Automatically runs [Fastfetch](config/zsh/fastfetch.zsh) on interactive shell startup, dynamically scaling output between full, compact, or suppressed based on current terminal dimensions.
-- **Local Overrides**: Machine-specific tokens and custom environment variables can be placed in `~/.config/zsh/local.zsh` (gitignored).
+| Script | Purpose | Key Flags | Privileges |
+| :--- | :--- | :--- | :--- |
+| [`install.sh`](install.sh) | Deploys symbolic links to `~/.config/`, bootstraps TPM and Oh-My-Zsh | `-d` (dry-run), `-b` (backup), `-s` (symlinks only), `--no-pkg` | Userland (non-root) |
+| [`scripts/install-deps.sh`](scripts/install-deps.sh) | Installs system packages, fonts, `fnm`, and `pnpm` | `-d` (dry-run), `-h` (help) | Elevates via `sudo` |
+| [`uninstall.sh`](uninstall.sh) | Safely unlinks repo dotfiles and restores backups | `-d` (dry-run), `-r` (restore backup), `--clean-plugins` | Userland (non-root) |
 
-### 📝 Neovim
-- **Plugin Management**: Bootstrapped with [`lazy.nvim`](config/nvim/lua/config/lazy.lua) and locked with [`lazy-lock.json`](config/nvim/lazy-lock.json).
-- **Core Plugins**:
-  - **LSP & Formatting**: Built-in LSP client via `mason.nvim` and `mason-lspconfig`, with automated formatters via `conform.nvim`.
-  - **Syntax & UI**: Treesitter syntax highlighting, Lualine statusline, Which-Key popup helper.
-  - **Productivity**: `oil.nvim` for buffer-like filesystem navigation, `snacks.nvim` for fuzzy finding and command palette, and `gitsigns.nvim` for git status.
+---
 
-### 🪟 Tmux
-- **Prefix Key**: Rebound to `Ctrl + Space`.
-- **Session Persistence**: Automated background session saving and restoration across reboots via `tmux-resurrect` and `tmux-continuum`.
-- **Navigation & Splits**: Split horizontal with `|` and vertical with `-`. Navigate panes using `Alt + Arrow keys` without prefix.
+## Core Toolchain & Architecture
 
-### ☁️ Systemd User Services
-- **Rclone Remote Mounting**: User unit template [`rclone@.service`](config/systemd/user/rclone@.service) enables automated mounting of cloud remotes:
-  ```bash
-  systemctl --user enable --now rclone@<remote_name>.service
-  ```
+| Component | Tool / Framework | Role & Key Features |
+| :--- | :--- | :--- |
+| **Editor** | [Neovim](https://neovim.io/) (>= 0.10) | Lua config, `lazy.nvim`, Mason LSP (`lua_ls`, `pyright`, `clangd`), Conform, Oil, Snacks |
+| **Shell** | [Zsh](https://www.zsh.org/) | Modular startup, Oh-My-Zsh, clean `$HOME` (`ZDOTDIR=~/.config/zsh`), adaptive Fastfetch |
+| **Terminal** | [Kitty](https://sw.kovidgoyal.net/kitty/) | GPU-accelerated terminal with Noctalia and Nord color palettes |
+| **Multiplexer** | [Tmux](https://github.com/tmux/tmux) | Prefix `Ctrl + Space`, TPM plugins, session restore via `tmux-resurrect` & `continuum` |
+| **Node.js** | [fnm](https://github.com/Schniz/fnm) | Ultra-fast Node manager with automatic `.nvmrc` version switching on `cd` |
+| **Packages** | [pnpm](https://pnpm.io/) | Fast, disk-efficient package manager integrated with `$PNPM_HOME` |
+| **Git Client** | [Lazygit](https://github.com/jesseduffield/lazygit) | High-productivity terminal UI for Git |
+| **System Info** | [Fastfetch](https://github.com/fastfetch-cli/fastfetch) | Responsive system fetch adapting layout to terminal window dimensions |
+| **Cloud Mount** | [systemd (user)](https://www.freedesktop.org/software/systemd/man/systemd.service.html) | On-demand cloud storage mounting via `rclone@<remote>.service` |
+
+---
+
+## Display Server & Desktop Portability
+
+This configuration suite is **100% desktop environment agnostic** and works identically across KDE Plasma, GNOME, Hyprland, Sway, and window managers:
+
+- **Wayland & X11 Clipboard**: Tmux dynamically dispatches between `wl-copy` (when `$WAYLAND_DISPLAY` is present) and `xclip` (on X11), alongside OSC 52 clipboard passthrough (`set-clipboard on`).
+- **Neovim Clipboard**: Configured with `opt.clipboard = "unnamedplus"`, automatically delegating to Wayland or X11 clipboard providers.
+- **Zero DE Coupling**: No system-level desktop configurations or WM shortcuts are overridden.
+
+---
+
+## Post-Installation Verification Checklist
+
+Confirm your environment is properly initialized:
+
+- [ ] **Shell**: Run `zsh` $\rightarrow$ Fastfetch banner loads adaptively without missing glyphs.
+- [ ] **Node & pnpm**: Run `node -v` and `pnpm -v` $\rightarrow$ Versions resolve via `fnm` and userland paths.
+- [ ] **Tmux**: Launch `tmux`, press `Ctrl + Space` followed by `I` $\rightarrow$ Plugins clone and compile.
+- [ ] **Neovim**: Run `nvim` $\rightarrow$ `lazy.nvim` installs plugins cleanly and Mason downloads language servers.
+- [ ] **Symlinks Integrity**: Inspect `ls -ld ~/.config/nvim ~/.zshenv` $\rightarrow$ Links point directly to `~/.myconfigs`.
 
 ---
 
 ## File Structure Reference
 
-For a complete and detailed mapping of all repository files to their target OS locations, see [**`structure.md`**](structure.md).
+For the comprehensive index mapping repository files to their target OS locations, inspect [**`structure.md`**](structure.md).
