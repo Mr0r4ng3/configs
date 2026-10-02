@@ -74,7 +74,6 @@ Quick reference index mapping repository files to their target OS locations. Des
 | File | Target OS Path | Purpose |
 | :--- | :--- | :--- |
 | [`config/kitty/kitty.conf`](config/kitty/kitty.conf) | `~/.config/kitty/kitty.conf` | Kitty terminal configuration |
-| [`config/kitty/themes/noctalia.conf`](config/kitty/themes/noctalia.conf) | `~/.config/kitty/themes/noctalia.conf` | Kitty Noctalia color theme |
 | [`config/kitty/themes/nord.conf`](config/kitty/themes/nord.conf) | `~/.config/kitty/themes/nord.conf` | Kitty Nord color theme |
 | [`config/tmux/tmux.conf`](config/tmux/tmux.conf) | `~/.config/tmux/tmux.conf` | Tmux multiplexer configuration |
 | [`config/tmux/plugins/`](config/tmux/plugins/) | `~/.config/tmux/plugins/` | Tmux Plugin Manager (TPM) plugins directory |

@@ -47,7 +47,7 @@ To rollback anytime and restore previous configurations:
 | :--- | :--- | :--- |
 | **Editor** | [Neovim](https://neovim.io/) (>= 0.10) | Lua config, `lazy.nvim`, Mason LSP (`lua_ls`, `pyright`, `clangd`), Conform, Oil, Snacks |
 | **Shell** | [Zsh](https://www.zsh.org/) | Modular startup, Oh-My-Zsh, clean `$HOME` (`ZDOTDIR=~/.config/zsh`), adaptive Fastfetch |
-| **Terminal** | [Kitty](https://sw.kovidgoyal.net/kitty/) | GPU-accelerated terminal with Noctalia and Nord color palettes |
+| **Terminal** | [Kitty](https://sw.kovidgoyal.net/kitty/) | GPU-accelerated terminal with Nord color palette |
 | **Multiplexer** | [Tmux](https://github.com/tmux/tmux) | Prefix `Ctrl + Space`, TPM plugins, session restore via `tmux-resurrect` & `continuum` |
 | **Node.js** | [fnm](https://github.com/Schniz/fnm) | Ultra-fast Node manager with automatic `.nvmrc` version switching on `cd` |
 | **Packages** | [pnpm](https://pnpm.io/) | Fast, disk-efficient package manager integrated with `$PNPM_HOME` |
