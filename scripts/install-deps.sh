@@ -187,6 +187,20 @@ main() {
     log_info "Fast Node Manager (fnm) is already installed."
   fi
 
+  # ----------------------------------------------------------------------------
+  # PNPM Package Manager Bootstrapping
+  # ----------------------------------------------------------------------------
+  if ! command -v pnpm >/dev/null 2>&1 && [ ! -f "$HOME/.local/share/pnpm/pnpm" ] && [ ! -f "$HOME/.local/share/pnpm/bin/pnpm" ]; then
+    log_info "Installing pnpm..."
+    if [ "$DRY_RUN" = true ]; then
+      echo -e "  ${CLR_WARN}(dry-run)${CLR_RESET} curl -fsSL https://get.pnpm.io/install.sh | env PNPM_HOME=\"$HOME/.local/share/pnpm\" sh -"
+    else
+      curl -fsSL https://get.pnpm.io/install.sh | env PNPM_HOME="$HOME/.local/share/pnpm" sh -
+    fi
+  else
+    log_info "pnpm is already installed."
+  fi
+
   log_success "System dependencies successfully installed and verified."
 }
 

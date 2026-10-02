@@ -4,3 +4,8 @@
 if command -v fnm >/dev/null 2>&1; then
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
+
+# ==============================================================================
+# PNPM Package Manager
+# ==============================================================================
+export PNPM_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/pnpm"

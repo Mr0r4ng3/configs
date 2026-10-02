@@ -12,12 +12,17 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 # Source Cargo environment if present
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
+# PNPM Home
+export PNPM_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/pnpm"
+
 # Ensure path variables only contain unique values (no duplicates)
 typeset -U path cdpath fpath manpath
 
 path=(
     "$HOME/.local/bin"
     "$HOME/.local/share/fnm"
+    "$PNPM_HOME"
+    "$PNPM_HOME/bin"
     "$HOME/.cargo/bin"
     $path                    # Includes original system paths
 )
