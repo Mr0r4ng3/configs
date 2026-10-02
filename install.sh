@@ -109,113 +109,26 @@ run_cmd() {
 }
 
 # ------------------------------------------------------------------------------
-# OS & Distribution Detection
-# ------------------------------------------------------------------------------
-detect_distro() {
-  if [ -f /etc/os-release ]; then
-    # shellcheck disable=SC1091
-    source /etc/os-release
-    DISTRO_ID="${ID:-unknown}"
-    DISTRO_ID_LIKE="${ID_LIKE:-}"
-  else
-    DISTRO_ID="unknown"
-    DISTRO_ID_LIKE=""
-  fi
-}
-
-# ------------------------------------------------------------------------------
-# Package Installation
+# Package Installation (Delegated to scripts/install-deps.sh)
 # ------------------------------------------------------------------------------
 install_system_packages() {
-  detect_distro
-  log_title "Step 1: Installing System Dependencies (${DISTRO_ID})"
+  log_title "Step 1: Installing System Dependencies"
 
   if [ "$INSTALL_PACKAGES" = false ]; then
     log_info "Package installation skipped by flag."
     return 0
   fi
 
-  local distro_family="unknown"
-  case "$DISTRO_ID" in
-    arch|cachyos|manjaro|endeavouros|artix|arcolinux|garuda)
-      distro_family="arch"
-      ;;
-    fedora|nobara|bazzite|rhel|centos|rocky|almalinux)
-      distro_family="fedora"
-      ;;
-    ubuntu|debian|pop|linuxmint|elementary|zorin|kali|raspbian)
-      distro_family="debian"
-      ;;
-    *)
-      case "$DISTRO_ID_LIKE" in
-        *arch*)
-          distro_family="arch"
-          ;;
-        *fedora*|*rhel*)
-          distro_family="fedora"
-          ;;
-        *debian*|*ubuntu*)
-          distro_family="debian"
-          ;;
-        *)
-          distro_family="unknown"
-          ;;
-      esac
-      ;;
-  esac
-
-  case "$distro_family" in
-    arch)
-      local pkgs=(
-        zsh git curl fzf ripgrep fd eza bat lazygit rclone jq fastfetch
-        unzip p7zip zstd neovim gcc make cmake nodejs npm python
-        python-pip luarocks kitty tmux wl-clipboard xclip ttf-jetbrains-mono-nerd
-      )
-      log_info "Installing Arch-family packages via pacman..."
-      if command -v paru >/dev/null 2>&1; then
-        run_cmd paru -S --needed --noconfirm "${pkgs[@]}"
-      elif command -v yay >/dev/null 2>&1; then
-        run_cmd yay -S --needed --noconfirm "${pkgs[@]}"
-      else
-        run_cmd sudo pacman -S --needed --noconfirm "${pkgs[@]}"
-      fi
-      ;;
-
-    fedora)
-      local pkgs=(
-        zsh git curl fzf ripgrep fd-find eza bat lazygit rclone jq fastfetch
-        unzip p7zip zstd neovim gcc make cmake nodejs npm python3
-        python3-pip kitty tmux wl-clipboard xclip jetbrains-mono-fonts-all
-      )
-      log_info "Installing Fedora-family packages via dnf..."
-      run_cmd sudo dnf install -y "${pkgs[@]}"
-      ;;
-
-    debian)
-      local pkgs=(
-        zsh git curl fzf ripgrep fd-find bat rclone jq fastfetch
-        unzip p7zip-full zstd neovim build-essential cmake
-        nodejs npm python3 python3-pip kitty tmux wl-clipboard xclip
-        lazygit eza fonts-jetbrains-mono
-      )
-      log_info "Installing Debian/Ubuntu-family packages via apt..."
-      run_cmd sudo apt update -y
-      run_cmd sudo apt install -y "${pkgs[@]}"
-
-      # Setup fd and bat shims in ~/.local/bin if named fdfind / batcat
-      run_cmd mkdir -p "$HOME/.local/bin"
-      if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
-        run_cmd ln -sfn "$(command -v fdfind)" "$HOME/.local/bin/fd"
-      fi
-      if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
-        run_cmd ln -sfn "$(command -v batcat)" "$HOME/.local/bin/bat"
-      fi
-      ;;
-
-    *)
-      log_warn "Unsupported or unmanaged distribution ($DISTRO_ID / $DISTRO_ID_LIKE). Please ensure required tools are installed manually."
-      ;;
-  esac
+  local deps_script="${REPO_DIR}/scripts/install-deps.sh"
+  if [ -f "$deps_script" ]; then
+    local args=()
+    if [ "$DRY_RUN" = true ]; then
+      args+=("-d")
+    fi
+    "$deps_script" "${args[@]}"
+  else
+    log_warn "Dependencies script not found at ${deps_script}. Skipping system packages."
+  fi
 }
 
 # ------------------------------------------------------------------------------
