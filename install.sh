@@ -135,14 +135,43 @@ install_system_packages() {
     return 0
   fi
 
+  local distro_family="unknown"
   case "$DISTRO_ID" in
-    arch|cachyos|manjaro|endeavouros)
+    arch|cachyos|manjaro|endeavouros|artix|arcolinux|garuda)
+      distro_family="arch"
+      ;;
+    fedora|nobara|bazzite|rhel|centos|rocky|almalinux)
+      distro_family="fedora"
+      ;;
+    ubuntu|debian|pop|linuxmint|elementary|zorin|kali|raspbian)
+      distro_family="debian"
+      ;;
+    *)
+      case "$DISTRO_ID_LIKE" in
+        *arch*)
+          distro_family="arch"
+          ;;
+        *fedora*|*rhel*)
+          distro_family="fedora"
+          ;;
+        *debian*|*ubuntu*)
+          distro_family="debian"
+          ;;
+        *)
+          distro_family="unknown"
+          ;;
+      esac
+      ;;
+  esac
+
+  case "$distro_family" in
+    arch)
       local pkgs=(
         zsh git curl fzf ripgrep fd eza bat lazygit rclone jq fastfetch
         unzip p7zip zstd neovim gcc make cmake nodejs npm python
         python-pip luarocks kitty tmux wl-clipboard ttf-jetbrains-mono-nerd
       )
-      log_info "Installing Arch/CachyOS packages via pacman..."
+      log_info "Installing Arch-family packages via pacman..."
       if command -v paru >/dev/null 2>&1; then
         run_cmd paru -S --needed --noconfirm "${pkgs[@]}"
       elif command -v yay >/dev/null 2>&1; then
@@ -158,23 +187,33 @@ install_system_packages() {
         unzip p7zip zstd neovim gcc make cmake nodejs npm python3
         python3-pip kitty tmux wl-clipboard jetbrains-mono-fonts-all
       )
-      log_info "Installing Fedora packages via dnf..."
+      log_info "Installing Fedora-family packages via dnf..."
       run_cmd sudo dnf install -y "${pkgs[@]}"
       ;;
 
-    ubuntu|debian|pop)
+    debian)
       local pkgs=(
         zsh git curl fzf ripgrep fd-find bat rclone jq fastfetch
         unzip p7zip-full zstd neovim build-essential cmake
         nodejs npm python3 python3-pip kitty tmux wl-clipboard
+        lazygit eza fonts-jetbrains-mono
       )
-      log_info "Installing Debian/Ubuntu packages via apt..."
+      log_info "Installing Debian/Ubuntu-family packages via apt..."
       run_cmd sudo apt update -y
       run_cmd sudo apt install -y "${pkgs[@]}"
+
+      # Setup fd and bat shims in ~/.local/bin if named fdfind / batcat
+      run_cmd mkdir -p "$HOME/.local/bin"
+      if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+        run_cmd ln -sfn "$(command -v fdfind)" "$HOME/.local/bin/fd"
+      fi
+      if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
+        run_cmd ln -sfn "$(command -v batcat)" "$HOME/.local/bin/bat"
+      fi
       ;;
 
     *)
-      log_warn "Unsupported or unmanaged distribution ($DISTRO_ID). Please ensure required tools are installed manually."
+      log_warn "Unsupported or unmanaged distribution ($DISTRO_ID / $DISTRO_ID_LIKE). Please ensure required tools are installed manually."
       ;;
   esac
 }
@@ -186,20 +225,42 @@ deploy_symlinks() {
   log_title "Step 2: Deploying Symbolic Links"
 
   # Ensure destination directories exist
-  run_cmd mkdir -p "$TARGET_CONFIG_DIR" "$TARGET_CONFIG_DIR/systemd/user"
+  run_cmd mkdir -p "$TARGET_CONFIG_DIR" "$TARGET_CONFIG_DIR/systemd/user" "$HOME/.local/bin"
+
+  # Helper function to link safely without GNU ln nesting
+  link_target() {
+    local src="$1"
+    local dst="$2"
+    local name="$3"
+
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+      if [ -L "$dst" ]; then
+        # Already a symlink: ln -sfn will replace safely
+        :
+      elif [ -d "$dst" ]; then
+        # Destination is a real directory: ln -sfn would create a nested link inside it
+        log_warn "Destination directory exists and is not a symlink: ${dst}"
+        log_info "Moving existing directory to backup: ${BACKUP_DIR}/${name}"
+        run_cmd mkdir -p "$BACKUP_DIR"
+        run_cmd mv "$dst" "$BACKUP_DIR/${name}"
+      else
+        # Destination is a regular file
+        if [ "$BACKUP_EXISTING" = true ]; then
+          log_info "Backing up existing file ${dst} -> ${BACKUP_DIR}/${name}"
+          run_cmd mkdir -p "$BACKUP_DIR"
+          run_cmd mv "$dst" "$BACKUP_DIR/${name}"
+        fi
+      fi
+    fi
+
+    log_info "Linking ${src} -> ${dst}"
+    run_cmd ln -sfn "$src" "$dst"
+  }
 
   # 1. Link .zshenv to $HOME/.zshenv
   local zshenv_source="${REPO_DIR}/.zshenv"
   local zshenv_target="$HOME/.zshenv"
-  
-  if [ -e "$zshenv_target" ] && [ ! -L "$zshenv_target" ] && [ "$BACKUP_EXISTING" = true ]; then
-    log_info "Backing up existing ${zshenv_target} to ${BACKUP_DIR}/.zshenv"
-    run_cmd mkdir -p "$BACKUP_DIR"
-    run_cmd mv "$zshenv_target" "$BACKUP_DIR/.zshenv"
-  fi
-  
-  log_info "Linking ${zshenv_source} -> ${zshenv_target}"
-  run_cmd ln -sfn "$zshenv_source" "$zshenv_target"
+  link_target "$zshenv_source" "$zshenv_target" ".zshenv"
 
   # 2. Link each module under config/ to ~/.config/
   if [ -d "$CONFIG_DIR" ]; then
@@ -217,24 +278,14 @@ deploy_symlinks() {
             local unit_name
             unit_name="$(basename "$unit")"
             local unit_target="$TARGET_CONFIG_DIR/systemd/user/$unit_name"
-            log_info "Linking systemd unit ${unit} -> ${unit_target}"
-            run_cmd ln -sfn "$unit" "$unit_target"
+            link_target "$unit" "$unit_target" "systemd-user-${unit_name}"
           done
         fi
         continue
       fi
 
       local target_path="$TARGET_CONFIG_DIR/$module_name"
-
-      # Handle backup if target exists and is not already a symlink
-      if [ -e "$target_path" ] && [ ! -L "$target_path" ] && [ "$BACKUP_EXISTING" = true ]; then
-        log_info "Backing up existing ${target_path} to ${BACKUP_DIR}/${module_name}"
-        run_cmd mkdir -p "$BACKUP_DIR"
-        run_cmd mv "$target_path" "$BACKUP_DIR/${module_name}"
-      fi
-
-      log_info "Linking module ${module} -> ${target_path}"
-      run_cmd ln -sfn "$module" "$target_path"
+      link_target "$module" "$target_path" "$module_name"
     done
   fi
 
@@ -263,11 +314,12 @@ bootstrap_toolchain() {
 
   # 2. Tmux Plugin Manager (TPM)
   local tpm_dir="${CONFIG_DIR}/tmux/plugins/tpm"
-  if [ ! -d "$tpm_dir" ]; then
-    log_info "Cloning Tmux Plugin Manager (TPM)..."
+  if [ ! -f "$tpm_dir/tpm" ]; then
+    log_info "Installing Tmux Plugin Manager (TPM)..."
+    run_cmd rm -rf "$tpm_dir"
     run_cmd git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
   else
-    log_info "TPM already present at ${tpm_dir}."
+    log_info "TPM already present and operational at ${tpm_dir}."
   fi
 
   # 3. Systemd User Daemon Reload
@@ -299,8 +351,15 @@ main() {
   echo -e "All configurations have been linked and initialized."
   echo -e "To apply shell changes immediately: ${CLR_INFO}source ~/.config/zsh/.zshrc${CLR_RESET}"
   echo -e "To install/update Tmux plugins: open tmux and press ${CLR_INFO}Ctrl+Space + I${CLR_RESET}"
-  echo -e "To initialize Neovim plugins: launch ${CLR_INFO}nvim${CLR_RESET}\n"
+  echo -e "To initialize Neovim plugins: launch ${CLR_INFO}nvim${CLR_RESET}"
+
+  local current_shell
+  current_shell="$(basename "${SHELL:-}")"
+  if [ "$current_shell" != "zsh" ] && command -v zsh >/dev/null 2>&1; then
+    echo -e "Note: Default shell is currently ${SHELL}. To set Zsh as default: ${CLR_INFO}chsh -s $(command -v zsh)${CLR_RESET}\n"
+  else
+    echo ""
+  fi
 }
 
 main "$@"
-

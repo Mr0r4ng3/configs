@@ -15,3 +15,11 @@ local.zsh
 .DS_Store
 Thumbs.db
 
+# Local AI runtime & indexes
+.atl/
+.codegraph/
+.engram/
+
+# Tmux plugins runtime
+config/tmux/plugins/*
+!config/tmux/plugins/.gitkeep

@@ -1,0 +1,20 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: Bash (>= 4.0), Zsh, Tmux, Neovim, Systemd, Linux (Debian/Ubuntu, Arch, Fedora)
+  Architecture: Modular XDG Base Directory Dotfiles (~/.config, ~/.zshenv)
+  Testing: Shell syntax validation (bash -n, zsh -n), dry-run idempotency checks
+  Style: POSIX / Modern Bash guidelines, set -euo pipefail
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Include concrete file paths in affected areas
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Document architecture decisions with rationale
+  tasks:
+    - Structure tasks sequentially and atomicity-first
