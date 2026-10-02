@@ -169,7 +169,7 @@ install_system_packages() {
       local pkgs=(
         zsh git curl fzf ripgrep fd eza bat lazygit rclone jq fastfetch
         unzip p7zip zstd neovim gcc make cmake nodejs npm python
-        python-pip luarocks kitty tmux wl-clipboard ttf-jetbrains-mono-nerd
+        python-pip luarocks kitty tmux wl-clipboard xclip ttf-jetbrains-mono-nerd
       )
       log_info "Installing Arch-family packages via pacman..."
       if command -v paru >/dev/null 2>&1; then
@@ -185,7 +185,7 @@ install_system_packages() {
       local pkgs=(
         zsh git curl fzf ripgrep fd-find eza bat lazygit rclone jq fastfetch
         unzip p7zip zstd neovim gcc make cmake nodejs npm python3
-        python3-pip kitty tmux wl-clipboard jetbrains-mono-fonts-all
+        python3-pip kitty tmux wl-clipboard xclip jetbrains-mono-fonts-all
       )
       log_info "Installing Fedora-family packages via dnf..."
       run_cmd sudo dnf install -y "${pkgs[@]}"
@@ -195,7 +195,7 @@ install_system_packages() {
       local pkgs=(
         zsh git curl fzf ripgrep fd-find bat rclone jq fastfetch
         unzip p7zip-full zstd neovim build-essential cmake
-        nodejs npm python3 python3-pip kitty tmux wl-clipboard
+        nodejs npm python3 python3-pip kitty tmux wl-clipboard xclip
         lazygit eza fonts-jetbrains-mono
       )
       log_info "Installing Debian/Ubuntu-family packages via apt..."
