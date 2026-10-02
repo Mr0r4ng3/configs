@@ -27,6 +27,7 @@ Quick reference index mapping repository files to their target OS locations. Des
 | :--- | :--- | :--- |
 | [`.zshenv`](.zshenv) | `~/.zshenv` | Root environment bootstrap: sets `ZDOTDIR="$HOME/.config/zsh"` |
 | [`install.sh`](install.sh) | N/A (Repository) | Automated idempotent installer and symlink deployment script |
+| [`uninstall.sh`](uninstall.sh) | N/A (Repository) | Safe uninstaller and rollback script with backup restoration |
 | [`scripts/install-deps.sh`](scripts/install-deps.sh) | N/A (Repository) | Standalone system package and dependencies installer |
 | [`README.md`](README.md) | N/A (Repository) | Main human documentation and user guide |
 | [`structure.md`](structure.md) | N/A (Repository) | Lightweight structural index and OS mapping directory |

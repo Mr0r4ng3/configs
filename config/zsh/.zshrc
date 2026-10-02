@@ -25,7 +25,6 @@ plugins=(
   docker
   docker-compose
   uv
-  nvm
 )
 
 # Load Oh My Zsh

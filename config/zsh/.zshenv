@@ -17,6 +17,7 @@ typeset -U path cdpath fpath manpath
 
 path=(
     "$HOME/.local/bin"
+    "$HOME/.local/share/fnm"
     "$HOME/.cargo/bin"
     $path                    # Includes original system paths
 )

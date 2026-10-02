@@ -122,7 +122,7 @@ main() {
     arch)
       local pkgs=(
         zsh git curl fzf ripgrep fd eza bat lazygit rclone jq fastfetch
-        unzip p7zip zstd neovim gcc make cmake nodejs npm python
+        unzip p7zip zstd neovim gcc make cmake python
         python-pip luarocks kitty tmux wl-clipboard xclip ttf-jetbrains-mono-nerd
       )
       log_info "Installing Arch-family packages via pacman..."
@@ -138,7 +138,7 @@ main() {
     fedora)
       local pkgs=(
         zsh git curl fzf ripgrep fd-find eza bat lazygit rclone jq fastfetch
-        unzip p7zip zstd neovim gcc make cmake nodejs npm python3
+        unzip p7zip zstd neovim gcc make cmake python3
         python3-pip kitty tmux wl-clipboard xclip jetbrains-mono-fonts-all
       )
       log_info "Installing Fedora-family packages via dnf..."
@@ -149,7 +149,7 @@ main() {
       local pkgs=(
         zsh git curl fzf ripgrep fd-find bat rclone jq fastfetch
         unzip p7zip-full zstd neovim build-essential cmake
-        nodejs npm python3 python3-pip kitty tmux wl-clipboard xclip
+        python3 python3-pip kitty tmux wl-clipboard xclip
         lazygit eza fonts-jetbrains-mono
       )
       log_info "Installing Debian/Ubuntu-family packages via apt..."
@@ -172,6 +172,20 @@ main() {
       return 1
       ;;
   esac
+
+  # ----------------------------------------------------------------------------
+  # Fast Node Manager (fnm) Bootstrapping
+  # ----------------------------------------------------------------------------
+  if ! command -v fnm >/dev/null 2>&1 && [ ! -f "$HOME/.local/share/fnm/fnm" ]; then
+    log_info "Installing Fast Node Manager (fnm)..."
+    if [ "$DRY_RUN" = true ]; then
+      echo -e "  ${CLR_WARN}(dry-run)${CLR_RESET} curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell"
+    else
+      curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
+    fi
+  else
+    log_info "Fast Node Manager (fnm) is already installed."
+  fi
 
   log_success "System dependencies successfully installed and verified."
 }
