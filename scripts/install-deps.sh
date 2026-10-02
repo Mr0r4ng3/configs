@@ -201,6 +201,17 @@ main() {
     log_info "pnpm is already installed."
   fi
 
+  # ----------------------------------------------------------------------------
+  # User Binaries Symlinks (~/.local/bin)
+  # ----------------------------------------------------------------------------
+  run_cmd mkdir -p "$HOME/.local/bin"
+  if [ -f "$HOME/.local/share/fnm/fnm" ] && [ ! -e "$HOME/.local/bin/fnm" ]; then
+    run_cmd ln -sfn "$HOME/.local/share/fnm/fnm" "$HOME/.local/bin/fnm"
+  fi
+  if [ -f "$HOME/.local/share/pnpm/bin/pnpm" ] && [ ! -e "$HOME/.local/bin/pnpm" ]; then
+    run_cmd ln -sfn "$HOME/.local/share/pnpm/bin/pnpm" "$HOME/.local/bin/pnpm"
+  fi
+
   log_success "System dependencies successfully installed and verified."
 }
 
